@@ -1,0 +1,60 @@
+# --- OS Metadata ---
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# --- Security & Secrets (CRITICAL) ---
+# Never track actual keys, tokens, or local-only overrides
+.secrets
+*.pem
+*.key
+*.pub
+.env
+.env.*
+!.env.example
+.netrc
+.npmrc
+bash_history
+.bash_history
+.python_history
+.node_repl_history
+
+# --- Local Overrides ---
+# Allow users to have machine-specific configs that aren't synced
+*.local
+.bashrc.local
+.path.local
+.alias.local
+
+# --- Shell / Tool Specific ---
+# Temporary files and sockets
+.bash_sessions/
+.cache/
+.viminfo
+.swp
+*.swp
+.swo
+*~
+.nvm/
+.rbenv/
+
+# --- Extension / Plugin Managers ---
+# Better to track the config/init script, not the downloaded binaries
+vendor/
+dist/
+bin/
+libexec/
+# If using a plugin manager for bash (like oh-my-bash), ignore the core
+oh-my-bash/
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Project Specific ---
+# Ignore the agent's scratchpad if you use one
+scratch/
+tmp/
