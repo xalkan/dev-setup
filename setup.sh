@@ -16,7 +16,8 @@ paru -S --noconfirm \
     python-uv fnm-bin github-cli \
     zsh zsh-autosuggestions zsh-syntax-highlighting \
     zoxide fzf eza bat ripgrep jq direnv \
-    ttf-firacode-nerd
+    ttf-firacode-nerd \
+    opencode starship
 
 # --- 3. SHELL SETUP ---
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -40,30 +41,17 @@ else
 fi
 
 # --- 5. CONFIGURATION INJECTION (.zshrc) ---
-cat << 'EOF' > ~/.zshrc
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
-plugins=(git docker kubectl node python zoxide direnv)
-source $ZSH/oh-my-zsh.sh
-
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-eval "$(fnm env --use-on-cd)"
-eval "$(zoxide init zsh)"
-eval "$(direnv hook zsh)"
-eval "$(uv generate-shell-completion zsh)"
-
-# Aliases
-alias ls='eza --icons --group-directories-first'
-alias cat='bat'
-alias k='kubectl'
-alias kn='k9s'
-alias lg='lazygit'
-alias ld='lazydocker'
-alias dcu='docker-compose up -d'
-alias tldr='tldr' # Tealdeer uses the same command
-EOF
+# --- 5. CONFIGURATION INJECTION (.zshrc) ---
+if [ -f "$PWD/dotfiles/.zshrc" ]; then
+    if [ -f "$HOME/.zshrc" ]; then
+        echo "⚠️  $HOME/.zshrc already exists. Backing up to $HOME/.zshrc.bak."
+        mv "$HOME/.zshrc" "$HOME/.zshrc.bak"
+    fi
+    cp "$PWD/dotfiles/.zshrc" "$HOME/.zshrc"
+    echo "✅ Copied dotfiles/.zshrc to $HOME/.zshrc."
+else
+    echo "❌ dotfiles/.zshrc not found. Skipping .zshrc setup."
+fi
 
 # --- 6. KITTY CONFIG ---
 mkdir -p ~/.config/kitty
@@ -85,6 +73,25 @@ mkdir -p ~/.config/tmuxinator
 
 # Add Tmuxinator Editor environment variable to .zshrc
 echo 'export EDITOR="code"' >> ~/.zshrc
+
+# --- 7.1 STARSHIP PROMPT SETUP ---
+mkdir -p ~/.config
+cat << 'EOF' > ~/.config/starship.toml
+[character]
+success_symbol = "[❯](bold green)"
+EOF
+
+# Add Starship init to .zshrc if not present
+if ! grep -q 'starship init zsh' ~/.zshrc; then
+    echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+    echo "✅ Added Starship prompt initialization to .zshrc."
+fi
+
+# --- 7.2 OPENCODE ALIAS SETUP ---
+if ! grep -q 'alias oc=' ~/.zshrc; then
+    echo 'alias oc="opencode"' >> ~/.zshrc
+    echo "✅ Added 'oc' alias for opencode to .zshrc."
+fi
 
 # --- 8. DOCKER FIXES ---
 # Ensure the docker group exists and the service is recognized
